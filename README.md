@@ -1,0 +1,1 @@
+"# Kaihatsu Nikki (Development Diary)" 
