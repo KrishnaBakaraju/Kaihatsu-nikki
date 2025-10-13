@@ -30,9 +30,11 @@ public class SubCategoryController {
     }
 
     @PostMapping
+    @Deprecated
     public SubCategory createSubCategory(@RequestBody SubCategory subCategory) {
         return subCategoryService.createSubCategory(subCategory);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSubCategory(@PathVariable Long id) {

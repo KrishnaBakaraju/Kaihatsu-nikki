@@ -1,40 +1,54 @@
 package com.example.kaihatsu_nikki.controller;
 
+import com.example.kaihatsu_nikki.model.SubCategory;
 import com.example.kaihatsu_nikki.model.SubCategoryEntry;
 import com.example.kaihatsu_nikki.service.SubCategoryEntryService;
+import com.example.kaihatsu_nikki.service.SubCategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/entries")
+@RequestMapping("/api")
 public class SubCategoryEntryController {
 
     private final SubCategoryEntryService entryService;
+    private final SubCategoryService subCategoryService;
 
-    public SubCategoryEntryController(SubCategoryEntryService entryService) {
+    public SubCategoryEntryController(SubCategoryEntryService entryService, SubCategoryService subCategoryService) {
         this.entryService = entryService;
+        this.subCategoryService = subCategoryService;
     }
 
-    @GetMapping
+    @GetMapping("/entries")
     public List<SubCategoryEntry> getAllEntries() {
         return entryService.getAllEntries();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/entries/{id}")
     public ResponseEntity<SubCategoryEntry> getEntryById(@PathVariable Long id) {
         return entryService.getEntryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public SubCategoryEntry createEntry(@RequestBody SubCategoryEntry entry) {
-        return entryService.createEntry(entry);
+    // ✅ NEW ENDPOINT: Create entry under a specific subcategory
+    @PostMapping("/subcategories/{subCategoryId}/entries")
+    public ResponseEntity<SubCategoryEntry> createEntryUnderSubCategory(
+            @PathVariable Long subCategoryId,
+            @RequestBody SubCategoryEntry entry) {
+
+        return subCategoryService.getSubCategoryById(subCategoryId)
+                .map(subCategory -> {
+                    entry.setSubCategory(subCategory);
+                    SubCategoryEntry saved = entryService.createEntry(entry);
+                    return ResponseEntity.ok(saved);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/entries/{id}")
     public ResponseEntity<Void> deleteEntry(@PathVariable Long id) {
         entryService.deleteEntry(id);
         return ResponseEntity.noContent().build();

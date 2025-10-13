@@ -1,9 +1,11 @@
 package com.example.kaihatsu_nikki.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SubCategoryEntry {
 
     @Id
@@ -14,8 +16,9 @@ public class SubCategoryEntry {
     private String details;
     private int progressValue;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_category_id")
+    @JsonIgnoreProperties("entries")
     private SubCategory subCategory;
 
     public SubCategoryEntry() {}

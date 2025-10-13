@@ -1,7 +1,9 @@
 package com.example.kaihatsu_nikki.controller;
 
 import com.example.kaihatsu_nikki.model.Category;
+import com.example.kaihatsu_nikki.model.SubCategory;
 import com.example.kaihatsu_nikki.service.CategoryService;
+import com.example.kaihatsu_nikki.service.SubCategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +14,11 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final SubCategoryService subCategoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, SubCategoryService subCategoryService) {
         this.categoryService = categoryService;
+        this.subCategoryService = subCategoryService;
     }
 
     @GetMapping
@@ -38,5 +42,26 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{categoryId}/subcategories")
+    public ResponseEntity<SubCategory> createSubCategoryUnderCategory(
+            @PathVariable Long categoryId,
+            @RequestBody SubCategory subCategory) {
+
+        return categoryService.getCategoryById(categoryId)
+                .map(category -> {
+                    subCategory.setCategory(category);
+                    SubCategory saved = subCategoryService.createSubCategory(subCategory);
+                    return ResponseEntity.ok(saved);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{categoryId}/subcategories")
+    public ResponseEntity<List<SubCategory>> getSubCategoriesByCategory(@PathVariable Long categoryId) {
+        return categoryService.getCategoryById(categoryId)
+                .map(category -> ResponseEntity.ok(category.getSubCategories()))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

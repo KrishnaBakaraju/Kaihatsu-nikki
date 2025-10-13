@@ -1,10 +1,12 @@
 package com.example.kaihatsu_nikki.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SubCategory {
 
     @Id
@@ -13,11 +15,14 @@ public class SubCategory {
 
     private String name;
 
-    @ManyToOne
+    // 👇 Ignore back reference to category to break recursion
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties("subCategories")
     private Category category;
 
     @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("subCategory")
     private List<SubCategoryEntry> entries = new ArrayList<>();
 
     public SubCategory() {}
