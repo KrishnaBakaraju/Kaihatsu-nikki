@@ -1,11 +1,11 @@
 package com.example.kaihatsu_nikki.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "subcategory_entries")
 public class SubCategoryEntry {
 
     @Id
@@ -16,12 +16,14 @@ public class SubCategoryEntry {
     private String details;
     private int progressValue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 🔙 Many entries belong to one subcategory
+    @ManyToOne
     @JoinColumn(name = "sub_category_id")
-    @JsonIgnoreProperties("entries")
+    @JsonBackReference(value = "subcategory-entry")
     private SubCategory subCategory;
 
     public SubCategoryEntry() {}
+
     public SubCategoryEntry(LocalDate date, String details, int progressValue, SubCategory subCategory) {
         this.date = date;
         this.details = details;
@@ -29,6 +31,7 @@ public class SubCategoryEntry {
         this.subCategory = subCategory;
     }
 
+    // 🧾 Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

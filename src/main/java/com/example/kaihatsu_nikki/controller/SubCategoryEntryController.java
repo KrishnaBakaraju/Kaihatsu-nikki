@@ -4,53 +4,54 @@ import com.example.kaihatsu_nikki.model.SubCategory;
 import com.example.kaihatsu_nikki.model.SubCategoryEntry;
 import com.example.kaihatsu_nikki.service.SubCategoryEntryService;
 import com.example.kaihatsu_nikki.service.SubCategoryService;
+import com.example.kaihatsu_nikki.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users/{userId}/subcategories/{subCategoryId}/entries")
 public class SubCategoryEntryController {
 
     private final SubCategoryEntryService entryService;
     private final SubCategoryService subCategoryService;
+    private final UserService userService;
 
-    public SubCategoryEntryController(SubCategoryEntryService entryService, SubCategoryService subCategoryService) {
+    public SubCategoryEntryController(SubCategoryEntryService entryService,
+                                      SubCategoryService subCategoryService,
+                                      UserService userService) {
         this.entryService = entryService;
         this.subCategoryService = subCategoryService;
+        this.userService = userService;
     }
 
-    @GetMapping("/entries")
-    public List<SubCategoryEntry> getAllEntries() {
-        return entryService.getAllEntries();
-    }
+    @GetMapping
+    public ResponseEntity<List<SubCategoryEntry>> getEntriesForUserSubCategory(
+            @PathVariable Long userId,
+            @PathVariable Long subCategoryId) {
 
-    @GetMapping("/entries/{id}")
-    public ResponseEntity<SubCategoryEntry> getEntryById(@PathVariable Long id) {
-        return entryService.getEntryById(id)
-                .map(ResponseEntity::ok)
+        return userService.getUserById(userId)
+                .flatMap(user -> subCategoryService.getSubCategoryById(subCategoryId)
+                        .filter(subCat -> subCat.getCategory().getUser().getId().equals(user.getId())))
+                .map(subCategory -> ResponseEntity.ok(subCategory.getEntries()))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ NEW ENDPOINT: Create entry under a specific subcategory
-    @PostMapping("/subcategories/{subCategoryId}/entries")
-    public ResponseEntity<SubCategoryEntry> createEntryUnderSubCategory(
+    @PostMapping
+    public ResponseEntity<SubCategoryEntry> createEntryForUserSubCategory(
+            @PathVariable Long userId,
             @PathVariable Long subCategoryId,
             @RequestBody SubCategoryEntry entry) {
 
-        return subCategoryService.getSubCategoryById(subCategoryId)
+        return userService.getUserById(userId)
+                .flatMap(user -> subCategoryService.getSubCategoryById(subCategoryId)
+                        .filter(subCat -> subCat.getCategory().getUser().getId().equals(user.getId())))
                 .map(subCategory -> {
                     entry.setSubCategory(subCategory);
                     SubCategoryEntry saved = entryService.createEntry(entry);
                     return ResponseEntity.ok(saved);
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/entries/{id}")
-    public ResponseEntity<Void> deleteEntry(@PathVariable Long id) {
-        entryService.deleteEntry(id);
-        return ResponseEntity.noContent().build();
     }
 }

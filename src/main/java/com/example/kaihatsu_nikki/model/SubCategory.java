@@ -1,36 +1,41 @@
 package com.example.kaihatsu_nikki.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "subcategories")
 public class SubCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
-    // 👇 Ignore back reference to category to break recursion
-    @ManyToOne(fetch = FetchType.LAZY)
+    // 🔙 Many subcategories belong to one category
+    @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonIgnoreProperties("subCategories")
+    @JsonBackReference(value = "category-subcategory")
     private Category category;
 
+    // 🟢 One subcategory -> many entries
     @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("subCategory")
+    @JsonManagedReference(value = "subcategory-entry")
     private List<SubCategoryEntry> entries = new ArrayList<>();
 
     public SubCategory() {}
+
     public SubCategory(String name, Category category) {
         this.name = name;
         this.category = category;
     }
 
+    // 🧾 Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
