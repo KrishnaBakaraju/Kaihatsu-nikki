@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class KaihatsuNikkiApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(KaihatsuNikkiApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(KaihatsuNikkiApplication.class, args);
+    }
 }
