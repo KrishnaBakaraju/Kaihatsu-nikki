@@ -67,9 +67,14 @@
     <optional>true</optional>
 </dependency>
 
-<!-- Spring Boot Starter Test (optional for now) -->
 
 
+<!-- MySQL Connector -->
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.4.0</version>
+</dependency>
 
 
 
