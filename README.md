@@ -2,7 +2,7 @@
 
 **Kaihatsu Nikki** (開発日記) is a **Spring Boot** REST API for tracking personal development progress with hierarchical organization: Users → Categories → Subcategories → Entries, plus daily diary functionality.
 
-## 🎯 Project Overview
+##  Project Overview
 
 This project demonstrates core **Spring Boot** concepts including:
 - **Spring Data JPA** for database persistence
@@ -48,7 +48,7 @@ User
 
 ---
 
-## 🚀 Key Spring Boot Features Used
+##  Key Spring Boot Features Used
 
 ### 1. **Dependency Injection (Constructor-Based)**
 All services are injected via constructor, promoting testability and loose coupling:
@@ -363,12 +363,6 @@ src/
 3. Commit changes with clear messages
 4. Push and open a pull request
 
----
 
-## 📄 License
-
-Add your license here.
-
----
 
 **Built with ❤️ using Spring Boot 3.5.6 & Java
